@@ -52,7 +52,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:4200",
+                "https://parqueadero-frontend-pink.vercel.app"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
         configuration.setExposedHeaders(List.of("Authorization"));
@@ -70,22 +73,17 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
-
                 .requestMatchers("/api/clientes/**").hasRole("ADMIN")
                 .requestMatchers("/api/pagos/**").hasRole("ADMIN")
                 .requestMatchers("/api/facturas/**").hasRole("ADMIN")
                 .requestMatchers("/api/menus/**").hasRole("ADMIN")
-
                 .requestMatchers("/api/cliente/**").hasAnyRole("CLIENTE", "ADMIN")
-
                 .requestMatchers("/api/vehiculos/**").authenticated()
                 .requestMatchers("/api/tickets/**").authenticated()
                 .requestMatchers("/api/reservas/**").authenticated()
                 .requestMatchers("/api/espacios/**").authenticated()
-
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults());
