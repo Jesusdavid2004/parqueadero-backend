@@ -52,9 +52,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
+        String frontendUrl = System.getenv("FRONTEND_URL");
+
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:4200",
-                "https://parqueadero-frontend-pink.vercel.app"
+                "https://parqueadero-frontend-pi.vercel.app",
+                "https://parqueadero-frontend-hfzoxq1ly-jesusdavid2004s-projects.vercel.app",
+                frontendUrl != null ? frontendUrl : "http://localhost:4200"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));

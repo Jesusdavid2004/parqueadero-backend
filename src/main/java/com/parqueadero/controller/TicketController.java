@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin("*")
 public class TicketController {
 
     private final TicketService ticketService;

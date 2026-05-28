@@ -2,7 +2,6 @@ package com.parqueadero.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +14,6 @@ import com.parqueadero.repository.VehiculoRepository;
 
 @RestController
 @RequestMapping("/api/cliente")
-@CrossOrigin
 public class ClienteDashboardController {
 
     private final UsuarioRepository usuarioRepository;
