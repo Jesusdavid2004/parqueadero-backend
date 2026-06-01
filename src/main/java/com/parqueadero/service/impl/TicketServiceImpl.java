@@ -13,10 +13,14 @@ import com.parqueadero.enums.EstadoTicket;
 import com.parqueadero.enums.TipoVehiculo;
 import com.parqueadero.exception.ResourceNotFoundException;
 import com.parqueadero.model.EspacioParqueo;
+import com.parqueadero.model.Factura;
+import com.parqueadero.model.Pago;
 import com.parqueadero.model.Tarifa;
 import com.parqueadero.model.Ticket;
 import com.parqueadero.model.Vehiculo;
 import com.parqueadero.repository.EspacioParqueoRepository;
+import com.parqueadero.repository.FacturaRepository;
+import com.parqueadero.repository.PagoRepository;
 import com.parqueadero.repository.TarifaRepository;
 import com.parqueadero.repository.TicketRepository;
 import com.parqueadero.repository.VehiculoRepository;
@@ -29,17 +33,23 @@ public class TicketServiceImpl implements TicketService {
     private final VehiculoRepository vehiculoRepository;
     private final EspacioParqueoRepository espacioRepository;
     private final TarifaRepository tarifaRepository;
+    private final PagoRepository pagoRepository;
+    private final FacturaRepository facturaRepository;
 
     public TicketServiceImpl(
             TicketRepository ticketRepository,
             VehiculoRepository vehiculoRepository,
             EspacioParqueoRepository espacioRepository,
-            TarifaRepository tarifaRepository
+            TarifaRepository tarifaRepository,
+            PagoRepository pagoRepository,
+            FacturaRepository facturaRepository
     ) {
         this.ticketRepository = ticketRepository;
         this.vehiculoRepository = vehiculoRepository;
         this.espacioRepository = espacioRepository;
         this.tarifaRepository = tarifaRepository;
+        this.pagoRepository = pagoRepository;
+        this.facturaRepository = facturaRepository;
     }
 
     @Override
@@ -86,6 +96,15 @@ public class TicketServiceImpl implements TicketService {
     public void eliminar(Long id) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado con id: " + id));
+
+        // Eliminar pagos asociados al ticket (y sus facturas)
+        List<Pago> pagos = pagoRepository.findByTicketId(id);
+        for (Pago pago : pagos) {
+            // Eliminar facturas asociadas al pago
+            List<Factura> facturas = facturaRepository.findByPagoId(pago.getId());
+            facturaRepository.deleteAll(facturas);
+        }
+        pagoRepository.deleteAll(pagos);
 
         // Al eliminar ticket, liberar espacio
         EspacioParqueo espacio = ticket.getEspacioParqueo();

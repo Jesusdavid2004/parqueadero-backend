@@ -57,6 +57,12 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:4200",
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://127.0.0.1:4200",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5173",
                 "https://parqueadero-frontend-pi.vercel.app",
                 "https://parqueadero-frontend-hfzoxq1ly-jesusdavid2004s-projects.vercel.app",
                 frontendUrl != null ? frontendUrl : "http://localhost:4200"
@@ -79,6 +85,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                .requestMatchers("/api/debug/**").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
                 .requestMatchers("/api/clientes/**").hasRole("ADMIN")
                 .requestMatchers("/api/pagos/**").hasRole("ADMIN")

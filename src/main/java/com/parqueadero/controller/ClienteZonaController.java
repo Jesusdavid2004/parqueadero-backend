@@ -9,8 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.http.ResponseEntity;
+
+import com.parqueadero.dto.ClienteDashboardResponse;
 import com.parqueadero.dto.TicketDTO;
 import com.parqueadero.dto.VehiculoDTO;
+import com.parqueadero.model.Cliente;
 import com.parqueadero.model.Ticket;
 import com.parqueadero.model.Usuario;
 import com.parqueadero.model.Vehiculo;
@@ -69,6 +73,25 @@ public class ClienteZonaController {
                 .stream()
                 .map(this::toTicketDTO)
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<ClienteDashboardResponse> dashboard() {
+        Usuario usuario = obtenerUsuarioAutenticado();
+        Cliente cliente = usuario.getCliente();
+        Long clienteId = cliente.getId();
+
+        long totalVehiculos = vehiculoRepository.countByClienteId(clienteId);
+        long totalTickets = ticketRepository.countByVehiculoClienteId(clienteId);
+
+        ClienteDashboardResponse response = new ClienteDashboardResponse();
+        response.setClienteId(clienteId);
+        response.setNombreCliente(cliente.getNombre());
+        response.setTotalVehiculos(totalVehiculos);
+        response.setTotalTickets(totalTickets);
+        response.setMensaje("Dashboard cargado correctamente");
+
+        return ResponseEntity.ok(response);
     }
 
     private VehiculoDTO toVehiculoDTO(Vehiculo vehiculo) {

@@ -10,4 +10,5 @@ import com.parqueadero.model.Vehiculo;
 public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
     Optional<Vehiculo> findByPlaca(String placa);
     List<Vehiculo> findByClienteId(Long clienteId);
+    long countByClienteId(Long clienteId);
 }
