@@ -65,6 +65,7 @@ public class SecurityConfig {
                 "http://127.0.0.1:5173",
                 "https://parqueadero-frontend-pi.vercel.app",
                 "https://parqueadero-frontend-hfzoxq1ly-jesusdavid2004s-projects.vercel.app",
+                "https://parqueadero-frontend-production.up.railway.app",
                 frontendUrl != null ? frontendUrl : "http://localhost:4200"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
