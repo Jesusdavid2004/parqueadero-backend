@@ -1,0 +1,140 @@
+@startuml Diseño_de_Despliegue
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam node {
+  BackgroundColor #E8EAF6
+  BorderColor #283593
+  FontColor #1A237E
+}
+skinparam artifact {
+  BackgroundColor #FFF9C4
+  BorderColor #F57F17
+}
+skinparam interface {
+  BackgroundColor #DCEDC8
+  BorderColor #33691E
+}
+
+title **Diagrama de Despliegue - Sistema de Parqueadero**
+footer Sistema de Gestión de Parqueadero v1.0
+
+' ============================================
+' USUARIOS
+' ============================================
+actor "Usuario\n(Admin/Cliente)" as User
+
+' ============================================
+' RAILWAY CLOUD
+' ============================================
+node "Railway Cloud Platform" as Railway #E8EAF6 {
+
+  ' ============================================
+  ' CONTENEDOR FRONTEND
+  ' ============================================
+  node "Contenedor Frontend\n(Nixpacks Builder)" as FrontendContainer #C5CAE9 {
+    
+    node "Node.js 20.19+" as NodeRuntime #9FA8DA {
+      artifact "Express 5.1\n(Servidor HTTP)" as Express #FFECB3
+      artifact "Angular 21 SSR\n(Server-Side Rendering)" as AngularSSR #FFE082
+    }
+    
+    artifact "dist/frontend-parqueadero/\nserver/server.mjs" as ServerMjs #FFF59D
+    artifact "dist/frontend-parqueadero/\nbrowser/" as BrowserDist #FFF9C4
+    
+    interface "Puerto 8080\n(HTTP)" as FrontendPort #AED581
+  }
+
+  ' ============================================
+  ' CONTENEDOR BACKEND
+  ' ============================================
+  node "Contenedor Backend\n(Docker + Maven)" as BackendContainer #C5CAE9 {
+    
+    node "Java 17 (Eclipse Temurin)" as JavaRuntime #9FA8DA {
+      artifact "Spring Boot 4.0.6" as SpringBoot #FFECB3
+      artifact "Spring Security" as SpringSecurity #FFE082
+      artifact "Spring Data JPA" as SpringJPA #FFD54F
+      artifact "Hibernate ORM 7.2" as Hibernate #FFCA28
+    }
+    
+    artifact "app.jar\n(parqueadero-0.0.1-SNAPSHOT)" as AppJar #FFF59D
+    
+    interface "Puerto 8080\n(HTTP)" as BackendPort #AED581
+  }
+
+  ' ============================================
+  ' CONTENEDOR BASE DE DATOS
+  ' ============================================
+  node "Contenedor PostgreSQL\n(Railway Managed)" as DatabaseContainer #C5CAE9 {
+    
+    node "PostgreSQL 18.4" as Postgres #9FA8DA {
+      artifact "Base de datos:\nrailway" as DBName #FFECB3
+      artifact "Esquema:\npublic" as SchemaName #FFE082
+    }
+    
+    interface "Puerto 5432\n(PostgreSQL)" as DBPort #AED581
+  }
+}
+
+' ============================================
+' CONEXIONES EXTERNAS
+' ============================================
+User --> FrontendPort : HTTPS\nparqueadero-frontend-production\n.up.railway.app
+
+' ============================================
+' CONEXIONES INTERNAS
+' ============================================
+FrontendPort --> Express : Solicitudes HTTP
+Express --> AngularSSR : Renderizado SSR
+AngularSSR --> ServerMjs : Ejecuta bundle
+ServerMjs --> BrowserDist : Archivos estáticos
+
+Express --> BackendPort : Peticiones REST API\nHTTPS\nparqueadero-backend-production\n.up.railway.app/api
+
+BackendPort --> SpringBoot : Solicitudes HTTP
+SpringBoot --> SpringSecurity : Autenticación\n(Basic Auth + BCrypt)
+SpringBoot --> SpringJPA : Operaciones CRUD
+SpringJPA --> Hibernate : Mapeo ORM
+Hibernate --> DBPort : Consultas SQL\n(postgres.railway.internal:5432)
+
+' ============================================
+' NOTAS TÉCNICAS
+' ============================================
+note right of FrontendContainer
+  **Configuración Frontend:**
+  - Builder: NIXPACKS v1.41.0
+  - Start: node dist/.../server.mjs
+  - Healthcheck: / (timeout 120s)
+  - Restart: ON_FAILURE (max 10)
+  - SSR: Angular Universal
+  - Trust Proxy: habilitado
+end note
+
+note right of BackendContainer
+  **Configuración Backend:**
+  - Builder: Docker (Maven)
+  - Base: eclipse-temurin:17-jre-alpine
+  - Build: mvnw clean package -DskipTests
+  - Start: java -jar app.jar
+  - Auth: HTTP Basic + Spring Security
+  - CORS: habilitado para frontend
+end note
+
+note right of DatabaseContainer
+  **Configuración PostgreSQL:**
+  - Host: postgres.railway.internal
+  - Port: 5432
+  - Database: railway
+  - Schema: public
+  - Pool: HikariCP
+  - Dialect: PostgreSQLDialect (auto)
+end note
+
+note bottom of Railway
+  **Red Interna Railway:**
+  Frontend ↔ Backend: HTTPS (público)
+  Backend ↔ PostgreSQL: postgres.railway.internal (interno)
+end note
+
+@enduml

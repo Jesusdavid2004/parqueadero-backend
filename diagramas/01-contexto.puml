@@ -1,0 +1,73 @@
+@startuml
+!theme plain
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor white
+  BorderColor #2F5597
+}
+skinparam rectangle {
+  BackgroundColor #F8FBFF
+  BorderColor #2F5597
+  RoundCorner 12
+}
+skinparam actorStyle awesome
+
+title Diagrama de Contexto - Sistema de Parqueadero
+
+actor "Administrador" as Admin
+actor "Cliente" as Cliente
+actor "Operador Railway" as Ops
+
+rectangle "Sistema de Parqueadero\n(Frontend Angular + Backend Spring Boot)" as Sistema {
+  usecase "Iniciar sesión" as UCAuth
+  usecase "Crear acceso de cliente" as UCRegistro
+  usecase "Administrar clientes" as UCClientes
+  usecase "Administrar vehículos" as UCVehiculos
+  usecase "Administrar tickets" as UCTickets
+  usecase "Administrar pagos y facturas" as UCPagos
+  usecase "Administrar reservas" as UCReservas
+  usecase "Administrar espacios, zonas y sedes" as UCEstructura
+  usecase "Administrar tarifas" as UCTarifas
+  usecase "Administrar empleados" as UCEmpleados
+  usecase "Administrar menú" as UCMenu
+  usecase "Consultar dashboard" as UCDashCliente
+  usecase "Consultar mis vehículos" as UCMisVehiculos
+  usecase "Consultar mis tickets" as UCMisTickets
+}
+
+database "PostgreSQL\n(Railway)" as DB
+cloud "Railway" as Railway
+
+Admin --> UCAuth
+Admin --> UCRegistro
+Admin --> UCClientes
+Admin --> UCVehiculos
+Admin --> UCTickets
+Admin --> UCPagos
+Admin --> UCReservas
+Admin --> UCEstructura
+Admin --> UCTarifas
+Admin --> UCEmpleados
+Admin --> UCMenu
+
+Cliente --> UCAuth
+Cliente --> UCDashCliente
+Cliente --> UCMisVehiculos
+Cliente --> UCMisTickets
+
+UCRegistro .> UCAuth : <<include>>
+
+Sistema --> DB : CRUD + consultas
+Railway -- Sistema : hospeda servicios
+Ops --> Railway : despliegue/monitoreo
+
+note bottom of Sistema
+ Acceso protegido con autenticación HTTP Basic Auth.
+ Frontend Angular con interceptor y guards.
+ Control de roles: ADMIN (gestión completa) / CLIENTE (consulta).
+ El admin crea accesos de cliente desde /admin/clientes → /register.
+ end note
+
+@enduml

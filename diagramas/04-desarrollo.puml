@@ -1,0 +1,312 @@
+@startuml Diseño_de_Desarrollo
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontName Arial
+skinparam defaultFontSize 10
+
+skinparam package {
+  BackgroundColor #F5F5F5
+  BorderColor #616161
+  FontColor #212121
+}
+
+skinparam component {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+  FontColor #0D47A1
+}
+
+skinparam interface {
+  BackgroundColor #FFF9C4
+  BorderColor #F57F17
+}
+
+title **Diagrama de Desarrollo - Arquitectura por Capas**\nSistema de Parqueadero
+footer Sistema de Gestión de Parqueadero v1.0
+
+' ============================================
+' FRONTEND - ANGULAR 21
+' ============================================
+
+package "Frontend - Angular 21 + TypeScript" as Frontend #E8F5E9 {
+  
+  package "Capa de Presentación (Pages)" as Pages #C8E6C9 {
+    component "LoginPageComponent" as Login
+    component "RegisterPageComponent" as Register
+    component "DashboardAdminPageComponent" as DashboardAdmin
+    component "DashboardClientePageComponent" as DashboardCliente
+    component "ClientesPageComponent" as ClientesPage
+    component "VehiculosPageComponent" as VehiculosPage
+    component "TicketsPageComponent" as TicketsPage
+    component "PagosFacturasPageComponent" as PagosFacturasPage
+    component "ReservasPageComponent" as ReservasPage
+    component "EspaciosPageComponent" as EspaciosPage
+    component "SedesPageComponent" as SedesPage
+    component "ZonasPageComponent" as ZonasPage
+    component "TarifasPageComponent" as TarifasPage
+    component "EmpleadosPageComponent" as EmpleadosPage
+    component "MenuPageComponent" as MenuPage
+  }
+  
+  package "Capa de Componentes Compartidos" as Shared #A5D6A7 {
+    component "MenuItemComponent" as MenuItem
+  }
+  
+  package "Capa de Servicios (Core)" as Services #81C784 {
+    component "AuthService" as AuthService
+    component "ClienteService" as ClienteService
+    component "VehiculoService" as VehiculoService
+    component "TicketService" as TicketService
+    component "PagoService" as PagoService
+    component "FacturaService" as FacturaService
+    component "ReservaService" as ReservaService
+    component "EspacioParqueoService" as EspacioService
+    component "SedeService" as SedeService
+    component "ZonaService" as ZonaService
+    component "TarifaService" as TarifaService
+    component "EmpleadoService" as EmpleadoService
+    component "MenuService" as MenuService
+    component "ClienteZonaService" as ClienteZonaService
+  }
+  
+  package "Capa de Modelos (Core)" as Models #66BB6A {
+    component "Interfaces TypeScript" as Interfaces
+    component "Enums" as Enums
+  }
+  
+  package "Capa de Seguridad" as Security #4CAF50 {
+    component "authGuard" as AuthGuard
+    component "roleGuard" as RoleGuard
+    component "authInterceptor" as AuthInterceptor
+  }
+}
+
+' ============================================
+' BACKEND - SPRING BOOT
+' ============================================
+
+package "Backend - Spring Boot 4.0.6 + Java 17" as Backend #E3F2FD {
+  
+  package "Capa de Controladores (REST API)" as Controllers #BBDEFB {
+    component "AuthController\n(/api/auth)" as AuthController
+    component "ClienteController\n(/api/clientes)" as ClienteController
+    component "VehiculoController\n(/api/vehiculos)" as VehiculoController
+    component "TicketController\n(/api/tickets)" as TicketController
+    component "PagoController\n(/api/pagos)" as PagoController
+    component "FacturaController\n(/api/facturas)" as FacturaController
+    component "ReservaController\n(/api/reservas)" as ReservaController
+    component "EspacioParqueoController\n(/api/espacios)" as EspacioController
+    component "SedeController\n(/api/sedes)" as SedeController
+    component "ZonaController\n(/api/zonas)" as ZonaController
+    component "TarifaController\n(/api/tarifas)" as TarifaController
+    component "EmpleadoController\n(/api/empleados)" as EmpleadoController
+    component "MenuController\n(/api/menus)" as MenuController
+    component "ClienteZonaController\n(/api/cliente)" as ClienteZonaController
+    component "DebugController\n(/api/debug)" as DebugController
+  }
+  
+  package "Capa de Servicios - Interfaces" as ServiceInterfaces #90CAF9 {
+    component "AuthService" as BackendAuthService
+    component "ClienteService" as BackendClienteService
+    component "VehiculoService" as BackendVehiculoService
+    component "TicketService" as BackendTicketService
+    component "PagoService" as BackendPagoService
+    component "FacturaService" as BackendFacturaService
+    component "ReservaService" as BackendReservaService
+    component "EspacioParqueoService" as BackendEspacioService
+    component "SedeService" as BackendSedeService
+    component "ZonaService" as BackendZonaService
+    component "TarifaService" as BackendTarifaService
+    component "EmpleadoService" as BackendEmpleadoService
+    component "MenuService" as BackendMenuService
+  }
+  
+  package "Capa de Servicios - Implementaciones" as ServiceImpl #64B5F6 {
+    component "AuthServiceImpl" as AuthServiceImpl
+    component "ClienteServiceImpl" as ClienteServiceImpl
+    component "VehiculoServiceImpl" as VehiculoServiceImpl
+    component "TicketServiceImpl" as TicketServiceImpl
+    component "PagoServiceImpl" as PagoServiceImpl
+    component "FacturaServiceImpl" as FacturaServiceImpl
+    component "ReservaServiceImpl" as ReservaServiceImpl
+    component "EspacioParqueoServiceImpl" as EspacioServiceImpl
+    component "SedeServiceImpl" as SedeServiceImpl
+    component "ZonaServiceImpl" as ZonaServiceImpl
+    component "TarifaServiceImpl" as TarifaServiceImpl
+    component "EmpleadoServiceImpl" as EmpleadoServiceImpl
+    component "MenuServiceImpl" as MenuServiceImpl
+  }
+  
+  package "Capa de Repositorios (JPA)" as Repositories #42A5F5 {
+    component "UsuarioRepository" as UsuarioRepo
+    component "ClienteRepository" as ClienteRepo
+    component "VehiculoRepository" as VehiculoRepo
+    component "TicketRepository" as TicketRepo
+    component "PagoRepository" as PagoRepo
+    component "FacturaRepository" as FacturaRepo
+    component "ReservaRepository" as ReservaRepo
+    component "EspacioParqueoRepository" as EspacioRepo
+    component "SedeRepository" as SedeRepo
+    component "ZonaRepository" as ZonaRepo
+    component "TarifaRepository" as TarifaRepo
+    component "EmpleadoRepository" as EmpleadoRepo
+    component "MenuRepository" as MenuRepo
+  }
+  
+  package "Capa de Modelos (Entidades JPA)" as Entities #2196F3 {
+    component "BaseEntity" as BaseEntity
+    component "Persona" as Persona
+    component "Cliente" as Cliente
+    component "Empleado" as Empleado
+    component "Vehiculo" as Vehiculo
+    component "Carro" as Carro
+    component "Moto" as Moto
+    component "Camion" as Camion
+    component "Sede" as Sede
+    component "Zona" as Zona
+    component "EspacioParqueo" as Espacio
+    component "Tarifa" as Tarifa
+    component "Ticket" as Ticket
+    component "Reserva" as Reserva
+    component "Pago" as Pago
+    component "Factura" as Factura
+    component "Usuario" as Usuario
+    component "Menu" as Menu
+  }
+  
+  package "Capa de DTOs" as DTOLayer #1976D2 {
+    component "AuthResponse" as AuthResponseDTO
+    component "LoginRequest" as LoginRequestDTO
+    component "RegisterRequest" as RegisterRequestDTO
+    component "ClienteDTO" as ClienteDTO
+    component "VehiculoDTO" as VehiculoDTO
+    component "TicketDTO" as TicketDTO
+    component "PagoDTO" as PagoDTO
+    component "FacturaDTO" as FacturaDTO
+    component "ReservaDTO" as ReservaDTO
+    component "EspacioParqueoDTO" as EspacioDTO
+    component "SedeDTO" as SedeDTO
+    component "ZonaDTO" as ZonaDTO
+    component "TarifaDTO" as TarifaDTO
+    component "EmpleadoDTO" as EmpleadoDTO
+    component "MenuRequest" as MenuRequestDTO
+    component "MenuResponse" as MenuResponseDTO
+    component "ClienteDashboardResponse" as DashboardDTO
+  }
+  
+  package "Capa de Seguridad" as BackendSecurity #1565C0 {
+    component "SecurityConfig" as SecurityConfig
+    component "BCryptPasswordEncoder" as PasswordEncoder
+    component "UserDetailsService" as UserDetailsService
+  }
+  
+  package "Capa de Excepciones" as Exceptions #0D47A1 {
+    component "GlobalExceptionHandler" as ExceptionHandler
+    component "ResourceNotFoundException" as ResourceNotFound
+    component "BusinessException" as BusinessException
+  }
+  
+  package "Capa de Enumeraciones" as EnumsBackend #0D47A1 {
+    component "RolUsuario" as RolUsuarioEnum
+    component "TipoVehiculo" as TipoVehiculoEnum
+    component "TipoZona" as TipoZonaEnum
+    component "EstadoEspacio" as EstadoEspacioEnum
+    component "EstadoTicket" as EstadoTicketEnum
+    component "EstadoPago" as EstadoPagoEnum
+    component "MetodoPago" as MetodoPagoEnum
+    component "EstadoReserva" as EstadoReservaEnum
+  }
+}
+
+' ============================================
+' BASE DE DATOS
+' ============================================
+
+database "PostgreSQL 18.4" as DB #F3E5F5 {
+  component "Tablas (18 entidades)" as Tables
+}
+
+' ============================================
+' RELACIONES - FRONTEND INTERNO
+' ============================================
+
+Pages --> Services : usa
+Services --> Models : usa
+Pages --> Security : protegido_por
+Services --> AuthInterceptor : interceptado_por
+
+' ============================================
+' RELACIONES - FRONTEND ↔ BACKEND (HTTP)
+' ============================================
+
+AuthService --> AuthController : HTTP POST\n/api/auth/login\n/api/auth/register\nHTTP GET /api/auth/me
+ClienteService --> ClienteController : HTTP REST\n/api/clientes
+VehiculoService --> VehiculoController : HTTP REST\n/api/vehiculos
+TicketService --> TicketController : HTTP REST\n/api/tickets
+PagoService --> PagoController : HTTP REST\n/api/pagos
+FacturaService --> FacturaController : HTTP REST\n/api/facturas
+ReservaService --> ReservaController : HTTP REST\n/api/reservas
+EspacioService --> EspacioController : HTTP REST\n/api/espacios
+SedeService --> SedeController : HTTP REST\n/api/sedes
+ZonaService --> ZonaController : HTTP REST\n/api/zonas
+TarifaService --> TarifaController : HTTP REST\n/api/tarifas
+EmpleadoService --> EmpleadoController : HTTP REST\n/api/empleados
+MenuService --> MenuController : HTTP REST\n/api/menus
+ClienteZonaService --> ClienteZonaController : HTTP REST\n/api/cliente
+
+' ============================================
+' RELACIONES - BACKEND INTERNO
+' ============================================
+
+Controllers --> ServiceInterfaces : invoca
+ServiceInterfaces <|.. ServiceImpl : implementa
+ServiceImpl --> Repositories : usa
+Repositories --> Entities : mapea
+Entities --> DTOLayer : convierte
+Controllers --> BackendSecurity : autenticado_por
+ServiceImpl --> Exceptions : lanza_excepciones
+Entities --> EnumsBackend : usa
+
+' ============================================
+' RELACIONES - BACKEND ↔ BASE DE DATOS
+' ============================================
+
+Repositories --> DB : JPA/Hibernate\n(SQL queries)
+
+' ============================================
+' NOTAS
+' ============================================
+
+note right of Frontend
+  **Arquitectura Frontend:**
+  - Standalone Components
+  - SSR (Server-Side Rendering)
+  - Reactive Forms
+  - RxJS para reactividad
+  - Guards para protección de rutas
+  - Interceptor para autenticación
+  - Basic Auth en headers
+end note
+
+note right of Backend
+  **Arquitectura Backend:**
+  - Spring Boot 4.0.6
+  - Spring Security (HTTP Basic)
+  - Spring Data JPA
+  - Hibernate ORM
+  - Lombok para boilerplate
+  - BCrypt para passwords
+  - Patrón: Controller → Service → Repository
+end note
+
+note bottom of DB
+  **Base de Datos:**
+  - 18 tablas principales
+  - Relaciones FK normalizadas
+  - Índices automáticos
+  - Auditoría (fecha_creacion,
+    fecha_actualizacion)
+  - Herencia JOINED para Vehiculo
+end note
+
+@enduml

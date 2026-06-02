@@ -1,0 +1,165 @@
+@startuml
+!theme plain
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam roundCorner 15
+skinparam usecase {
+  BackgroundColor #FFFFFF
+  BorderColor #2F5597
+  FontSize 11
+}
+skinparam rectangle {
+  BackgroundColor #F8FBFF
+  BorderColor #2F5597
+  RoundCorner 15
+}
+skinparam actorStyle awesome
+skinparam linetype ortho
+
+title Diagrama Funcional - Casos de Uso\nSistema de Parqueadero
+
+' ============================================
+' ACTOR: ADMINISTRADOR (izquierda)
+' ============================================
+
+actor "Administrador" as Admin #E3F2FD
+
+' ============================================
+' ACTOR: CLIENTE (derecha)
+' ============================================
+
+actor "Cliente" as Cliente #FFF3E0
+
+' ============================================
+' SISTEMA PRINCIPAL
+' ============================================
+
+rectangle "Sistema de Parqueadero" as Sistema {
+
+  rectangle "Autenticación" as ModAuth #E8F5E9 {
+    usecase "Iniciar sesión" as UCLogin
+    usecase "Consultar perfil\n(/auth/me)" as UCMe
+    usecase "Crear acceso\nde cliente" as UCRegister
+  }
+
+  rectangle "Gestión de Personas" as ModPersonas #E3F2FD {
+    usecase "Gestionar\nclientes" as UCClientes
+    usecase "Gestionar\nempleados" as UCEmpleados
+  }
+
+  rectangle "Gestión de Vehículos\ny Espacios" as ModVehEsp #E3F2FD {
+    usecase "Gestionar\nvehículos" as UCVehiculos
+    usecase "Gestionar\nespacios" as UCEspacios
+    usecase "Gestionar\nsedes" as UCSedes
+    usecase "Gestionar\nzonas" as UCZonas
+  }
+
+  rectangle "Gestión de Operaciones" as ModOps #E3F2FD {
+    usecase "Gestionar\ntickets" as UCTickets
+    usecase "Gestionar\npagos" as UCPagos
+    usecase "Gestionar\nfacturas" as UCFacturas
+    usecase "Gestionar\nreservas" as UCReservas
+  }
+
+  rectangle "Configuración" as ModConfig #E3F2FD {
+    usecase "Gestionar\ntarifas" as UCTarifas
+    usecase "Gestionar\nmenú" as UCMenu
+  }
+
+  rectangle "Consultas Admin" as ModConsAdmin #BBDEFB {
+    usecase "Espacios\ndisponibles" as UCEspDisp
+    usecase "Dashboard\nadmin" as UCDashAdmin
+  }
+
+  rectangle "Consultas Cliente" as ModConsCli #FFE0B2 {
+    usecase "Dashboard\ncliente" as UCDashCli
+    usecase "Mis\nvehículos" as UCMisVeh
+    usecase "Mis\ntickets" as UCMisTick
+  }
+}
+
+' ============================================
+' POSICIONAMIENTO INTERNO (rejilla)
+' ============================================
+
+ModAuth -[hidden]down-> ModPersonas
+ModAuth -[hidden]down-> ModConfig
+ModPersonas -[hidden]right-> ModConfig
+ModPersonas -[hidden]down-> ModVehEsp
+ModConfig -[hidden]down-> ModOps
+ModVehEsp -[hidden]right-> ModOps
+ModVehEsp -[hidden]down-> ModConsAdmin
+ModOps -[hidden]down-> ModConsCli
+ModConsAdmin -[hidden]right-> ModConsCli
+
+' ============================================
+' REGLAS DE NEGOCIO (debajo)
+' ============================================
+
+rectangle "Reglas de Negocio" as ModReglas #F3E5F5 {
+  usecase "Validar auth\ny rol" as UCValidar
+  usecase "Calcular total\ndel ticket" as UCCalcular
+  usecase "Actualizar estado\ndel espacio" as UCEstadoEsp
+  usecase "Generar pago\nasociado" as UCGenPago
+  usecase "Generar factura\nasociada" as UCGenFact
+  usecase "Construir árbol\nde menú" as UCArbol
+}
+
+' ============================================
+' ADMIN → MÓDULOS (izquierda, de arriba a abajo)
+' ============================================
+
+Admin --> ModAuth
+Admin --> ModPersonas
+Admin --> ModVehEsp
+Admin --> ModOps
+Admin --> ModConfig
+Admin --> ModConsAdmin
+
+' ============================================
+' CLIENTE → MÓDULOS (derecha, de arriba a abajo)
+' ============================================
+
+Cliente --> ModAuth
+Cliente --> ModConsCli
+
+' ============================================
+' INCLUDES: AUTENTICACIÓN
+' ============================================
+
+UCRegister .> UCLogin : <<include>>
+
+' ============================================
+' INCLUDES: REGLAS DE NEGOCIO
+' ============================================
+
+UCTickets .> UCCalcular : <<include>>
+UCTickets .> UCEstadoEsp : <<include>>
+UCTickets .> UCGenPago : <<extend>>
+UCGenPago .> UCGenFact : <<extend>>
+UCMenu .> UCArbol : <<include>>
+
+' ============================================
+' NOTAS
+' ============================================
+
+note right of UCRegister
+  El admin crea el acceso desde
+  /admin/clientes y redirige a
+  /register?rol=CLIENTE&clienteId=X
+end note
+
+note bottom of ModReglas
+  **Validación transversal:**
+  Todos los endpoints protegidos
+  validan Basic Auth y rol
+  vía Spring Security (<<include>>
+  a "Validar auth y rol").
+end note
+
+note bottom of UCGenPago
+  Se genera al cerrar un ticket
+  (extend, no siempre ocurre).
+end note
+
+@enduml

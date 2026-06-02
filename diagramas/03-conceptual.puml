@@ -1,0 +1,1109 @@
+@startuml
+!theme plain
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #616161
+  FontColor #212121
+}
+
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #1565C0
+  HeaderBackgroundColor #E3F2FD
+}
+
+skinparam enum {
+  BackgroundColor #FFF9C4
+  BorderColor #F57F17
+}
+
+title Diagrama Conceptual - Arquitectura por Capas\nSistema de Parqueadero
+
+' ============================================
+' PACKAGE: MODEL (Entidades JPA)
+' ============================================
+
+package "model\n(Entidades JPA - @Entity)" as Model #E3F2FD {
+
+  abstract class BaseEntity {
+    - id: Long <<PK, auto>>
+    - fechaCreacion: LocalDateTime
+    - fechaActualizacion: LocalDateTime
+    - activo: Boolean
+    --
+    + getId(): Long
+    + setId(id: Long): void
+    + getFechaCreacion(): LocalDateTime
+    + setFechaCreacion(fecha: LocalDateTime): void
+    + getFechaActualizacion(): LocalDateTime
+    + setFechaActualizacion(fecha: LocalDateTime): void
+    + getActivo(): Boolean
+    + setActivo(activo: Boolean): void
+    + prePersist(): void
+    + preUpdate(): void
+  }
+
+  abstract class Persona {
+    - identificacion: String <<unique, not null>>
+    - nombre: String <<not null>>
+    - telefono: String
+    - correo: String <<unique, not null>>
+    --
+    + getIdentificacion(): String
+    + setIdentificacion(id: String): void
+    + getNombre(): String
+    + setNombre(nombre: String): void
+    + getTelefono(): String
+    + setTelefono(telefono: String): void
+    + getCorreo(): String
+    + setCorreo(correo: String): void
+  }
+
+  class Cliente {
+    - direccion: String
+    --
+    + getDireccion(): String
+    + setDireccion(direccion: String): void
+  }
+
+  class Empleado {
+    - codigoEmpleado: String <<unique, not null>>
+    - cargo: String <<not null>>
+    --
+    + getCodigoEmpleado(): String
+    + setCodigoEmpleado(codigo: String): void
+    + getCargo(): String
+    + setCargo(cargo: String): void
+  }
+
+  abstract class Vehiculo {
+    - placa: String <<unique, not null>>
+    - marca: String <<not null>>
+    - modelo: String <<not null>>
+    - color: String
+    - tipoVehiculo: TipoVehiculo <<not null>>
+    - cliente: Cliente <<FK, not null>>
+    --
+    + getPlaca(): String
+    + setPlaca(placa: String): void
+    + getMarca(): String
+    + setMarca(marca: String): void
+    + getModelo(): String
+    + setModelo(modelo: String): void
+    + getColor(): String
+    + setColor(color: String): void
+    + getTipoVehiculo(): TipoVehiculo
+    + setTipoVehiculo(tipo: TipoVehiculo): void
+    + getCliente(): Cliente
+    + setCliente(cliente: Cliente): void
+  }
+
+  class Carro {
+    - numeroPuertas: Integer
+    --
+    + getNumeroPuertas(): Integer
+    + setNumeroPuertas(num: Integer): void
+    + Carro() { tipoVehiculo = CARRO }
+  }
+
+  class Moto {
+    - cilindraje: Integer
+    - tieneMaletero: Boolean
+    --
+    + getCilindraje(): Integer
+    + setCilindraje(cil: Integer): void
+    + getTieneMaletero(): Boolean
+    + setTieneMaletero(maletero: Boolean): void
+    + Moto() { tipoVehiculo = MOTO }
+  }
+
+  class Camion {
+    - numeroEjes: Integer
+    - capacidadCarga: Double
+    --
+    + getNumeroEjes(): Integer
+    + setNumeroEjes(ejes: Integer): void
+    + getCapacidadCarga(): Double
+    + setCapacidadCarga(cap: Double): void
+    + Camion() { tipoVehiculo = CAMION }
+  }
+
+  class Sede {
+    - nombre: String <<not null>>
+    - direccion: String <<not null>>
+    - ciudad: String <<not null>>
+    --
+    + getNombre(): String
+    + setNombre(nombre: String): void
+    + getDireccion(): String
+    + setDireccion(direccion: String): void
+    + getCiudad(): String
+    + setCiudad(ciudad: String): void
+  }
+
+  class Zona {
+    - nombre: String <<not null>>
+    - descripcion: String
+    - tipoZona: TipoZona <<not null>>
+    - sede: Sede <<FK, not null>>
+    --
+    + getNombre(): String
+    + setNombre(nombre: String): void
+    + getDescripcion(): String
+    + setDescripcion(desc: String): void
+    + getTipoZona(): TipoZona
+    + setTipoZona(tipo: TipoZona): void
+    + getSede(): Sede
+    + setSede(sede: Sede): void
+  }
+
+  class EspacioParqueo {
+    - codigo: String <<unique, not null>>
+    - ubicacion: String <<not null>>
+    - estado: EstadoEspacio <<not null>>
+    - tipoVehiculoPermitido: TipoVehiculo <<not null>>
+    - zona: Zona <<FK, not null>>
+    --
+    + getCodigo(): String
+    + setCodigo(codigo: String): void
+    + getUbicacion(): String
+    + setUbicacion(ubicacion: String): void
+    + getEstado(): EstadoEspacio
+    + setEstado(estado: EstadoEspacio): void
+    + getTipoVehiculoPermitido(): TipoVehiculo
+    + setTipoVehiculoPermitido(tipo: TipoVehiculo): void
+    + getZona(): Zona
+    + setZona(zona: Zona): void
+  }
+
+  class Tarifa {
+    - tipoVehiculo: TipoVehiculo <<unique, not null>>
+    - valorHora: Double <<not null>>
+    - valorDia: Double
+    - valorFraccion: Double
+    --
+    + getTipoVehiculo(): TipoVehiculo
+    + setTipoVehiculo(tipo: TipoVehiculo): void
+    + getValorHora(): Double
+    + setValorHora(valor: Double): void
+    + getValorDia(): Double
+    + setValorDia(valor: Double): void
+    + getValorFraccion(): Double
+    + setValorFraccion(valor: Double): void
+  }
+
+  class Ticket {
+    - codigoTicket: String <<unique, not null>>
+    - horaEntrada: LocalDateTime <<not null>>
+    - horaSalida: LocalDateTime
+    - estado: EstadoTicket <<not null>>
+    - total: Double <<not null>>
+    - vehiculo: Vehiculo <<FK, not null>>
+    - espacioParqueo: EspacioParqueo <<FK, not null>>
+    --
+    + getCodigoTicket(): String
+    + setCodigoTicket(codigo: String): void
+    + getHoraEntrada(): LocalDateTime
+    + setHoraEntrada(hora: LocalDateTime): void
+    + getHoraSalida(): LocalDateTime
+    + setHoraSalida(hora: LocalDateTime): void
+    + getEstado(): EstadoTicket
+    + setEstado(estado: EstadoTicket): void
+    + getTotal(): Double
+    + setTotal(total: Double): void
+    + getVehiculo(): Vehiculo
+    + setVehiculo(vehiculo: Vehiculo): void
+    + getEspacioParqueo(): EspacioParqueo
+    + setEspacioParqueo(espacio: EspacioParqueo): void
+  }
+
+  class Pago {
+    - monto: Double <<not null>>
+    - metodoPago: MetodoPago <<not null>>
+    - estado: EstadoPago <<not null>>
+    - referencia: String
+    - fecha: LocalDateTime <<not null>>
+    - ticket: Ticket <<FK, not null, unique>>
+    --
+    + getMonto(): Double
+    + setMonto(monto: Double): void
+    + getMetodoPago(): MetodoPago
+    + setMetodoPago(metodo: MetodoPago): void
+    + getEstado(): EstadoPago
+    + setEstado(estado: EstadoPago): void
+    + getReferencia(): String
+    + setReferencia(ref: String): void
+    + getFecha(): LocalDateTime
+    + setFecha(fecha: LocalDateTime): void
+    + getTicket(): Ticket
+    + setTicket(ticket: Ticket): void
+  }
+
+  class Factura {
+    - numeroFactura: String <<unique, not null>>
+    - subtotal: Double <<not null>>
+    - impuesto: Double <<not null>>
+    - total: Double <<not null>>
+    - pago: Pago <<FK, not null, unique>>
+    --
+    + getNumeroFactura(): String
+    + setNumeroFactura(num: String): void
+    + getSubtotal(): Double
+    + setSubtotal(subtotal: Double): void
+    + getImpuesto(): Double
+    + setImpuesto(impuesto: Double): void
+    + getTotal(): Double
+    + setTotal(total: Double): void
+    + getPago(): Pago
+    + setPago(pago: Pago): void
+  }
+
+  class Reserva {
+    - codigoReserva: String <<unique, not null>>
+    - fechaReserva: LocalDateTime <<not null>>
+    - horaInicio: LocalDateTime <<not null>>
+    - horaFin: LocalDateTime <<not null>>
+    - estado: EstadoReserva <<not null>>
+    - cliente: Cliente <<FK, not null>>
+    - vehiculo: Vehiculo <<FK, not null>>
+    - espacioParqueo: EspacioParqueo <<FK, not null>>
+    --
+    + getCodigoReserva(): String
+    + setCodigoReserva(codigo: String): void
+    + getFechaReserva(): LocalDateTime
+    + setFechaReserva(fecha: LocalDateTime): void
+    + getHoraInicio(): LocalDateTime
+    + setHoraInicio(hora: LocalDateTime): void
+    + getHoraFin(): LocalDateTime
+    + setHoraFin(hora: LocalDateTime): void
+    + getEstado(): EstadoReserva
+    + setEstado(estado: EstadoReserva): void
+    + getCliente(): Cliente
+    + setCliente(cliente: Cliente): void
+    + getVehiculo(): Vehiculo
+    + setVehiculo(vehiculo: Vehiculo): void
+    + getEspacioParqueo(): EspacioParqueo
+    + setEspacioParqueo(espacio: EspacioParqueo): void
+  }
+
+  class Usuario {
+    - username: String <<unique, not null>>
+    - email: String <<unique, not null>>
+    - password: String <<not null>>
+    - rol: RolUsuario <<not null>>
+    - cliente: Cliente <<FK, unique>>
+    --
+    + getUsername(): String
+    + setUsername(username: String): void
+    + getEmail(): String
+    + setEmail(email: String): void
+    + getPassword(): String
+    + setPassword(password: String): void
+    + getRol(): RolUsuario
+    + setRol(rol: RolUsuario): void
+    + getCliente(): Cliente
+    + setCliente(cliente: Cliente): void
+  }
+
+  class Menu {
+    - id: Long <<PK, auto>>
+    - nombre: String <<not null>>
+    - ruta: String
+    - activo: Boolean <<not null>>
+    - padre: Menu <<FK, nullable>>
+    - hijos: List<Menu>
+    --
+    + getId(): Long
+    + setId(id: Long): void
+    + getNombre(): String
+    + setNombre(nombre: String): void
+    + getRuta(): String
+    + setRuta(ruta: String): void
+    + getActivo(): Boolean
+    + setActivo(activo: Boolean): void
+    + getPadre(): Menu
+    + setPadre(padre: Menu): void
+    + getHijos(): List<Menu>
+    + setHijos(hijos: List<Menu>): void
+    + agregarHijo(hijo: Menu): void
+    + removerHijo(hijo: Menu): void
+  }
+
+  ' Herencia dentro de model
+  BaseEntity <|-- Persona
+  Persona <|-- Cliente
+  Persona <|-- Empleado
+  BaseEntity <|-- Vehiculo
+  Vehiculo <|-- Carro
+  Vehiculo <|-- Moto
+  Vehiculo <|-- Camion
+  BaseEntity <|-- Sede
+  BaseEntity <|-- Zona
+  BaseEntity <|-- EspacioParqueo
+  BaseEntity <|-- Tarifa
+  BaseEntity <|-- Ticket
+  BaseEntity <|-- Pago
+  BaseEntity <|-- Factura
+  BaseEntity <|-- Reserva
+  BaseEntity <|-- Usuario
+
+  ' Relaciones FK dentro de model
+  Cliente "1" -- "0..1" Usuario : posee >
+  Cliente "1" -- "1..*" Vehiculo : registra >
+  Cliente "1" -- "1..*" Reserva : realiza >
+  Vehiculo "1" -- "1..*" Ticket : genera >
+  Vehiculo "1" -- "1..*" Reserva : se_asocia >
+  Sede "1" -- "1..*" Zona : contiene >
+  Zona "1" -- "1..*" EspacioParqueo : organiza >
+  EspacioParqueo "1" -- "1..*" Ticket : atiende >
+  EspacioParqueo "1" -- "1..*" Reserva : reserva >
+  Ticket "1" -- "0..1" Pago : liquida >
+  Pago "1" -- "0..1" Factura : genera >
+  Menu "0..1" -- "0..*" Menu : padre → hijos
+}
+
+' ============================================
+' PACKAGE: ENUMS
+' ============================================
+
+package "enums\n(Enumeraciones)" as Enums #FFF9C4 {
+
+  enum RolUsuario {
+    ADMIN
+    CLIENTE
+  }
+
+  enum TipoVehiculo {
+    CARRO
+    MOTO
+    CAMION
+  }
+
+  enum TipoZona {
+    CARROS
+    MOTOS
+    CAMIONES
+    MIXTA
+  }
+
+  enum EstadoEspacio {
+    DISPONIBLE
+    OCUPADO
+    RESERVADO
+    INACTIVO
+  }
+
+  enum EstadoTicket {
+    ABIERTO
+    CERRADO
+    FACTURADO
+  }
+
+  enum EstadoPago {
+    PENDIENTE
+    APROBADO
+    RECHAZADO
+    REEMBOLSADO
+  }
+
+  enum MetodoPago {
+    EFECTIVO
+    TARJETA
+    TRANSFERENCIA
+    QR
+  }
+
+  enum EstadoReserva {
+    PENDIENTE
+    CONFIRMADA
+    CANCELADA
+    VENCIDA
+  }
+}
+
+' ============================================
+' PACKAGE: REPOSITORY (Interfaces JPA)
+' ============================================
+
+package "repository\n(Interfaces JPA - JpaRepository)" as Repository #E8F5E9 {
+
+  interface UsuarioRepository {
+    + findByUsername(username: String): Optional<Usuario>
+  }
+
+  interface ClienteRepository {
+    + findByIdentificacion(id: String): Optional<Cliente>
+  }
+
+  interface VehiculoRepository {
+    + findByPlaca(placa: String): Optional<Vehiculo>
+    + findByClienteId(clienteId: Long): List<Vehiculo>
+    + countByClienteId(clienteId: Long): long
+  }
+
+  interface TicketRepository {
+    + findByCodigoTicket(codigo: String): Optional<Ticket>
+    + findByVehiculoId(vehiculoId: Long): List<Ticket>
+  }
+
+  interface PagoRepository {
+    + findByTicketId(ticketId: Long): Optional<Pago>
+  }
+
+  interface FacturaRepository {
+    + findByPagoId(pagoId: Long): Optional<Factura>
+  }
+
+  interface ReservaRepository {
+    + findByClienteId(clienteId: Long): List<Reserva>
+    + findByEspacioParqueoId(espacioId: Long): List<Reserva>
+  }
+
+  interface EspacioParqueoRepository {
+    + findByCodigo(codigo: String): Optional<EspacioParqueo>
+    + findByEstado(estado: EstadoEspacio): List<EspacioParqueo>
+    + findByZonaId(zonaId: Long): List<EspacioParqueo>
+  }
+
+  interface SedeRepository {
+    + findByNombre(nombre: String): Optional<Sede>
+  }
+
+  interface ZonaRepository {
+    + findBySedeId(sedeId: Long): List<Zona>
+  }
+
+  interface TarifaRepository {
+    + findByTipoVehiculo(tipo: TipoVehiculo): Optional<Tarifa>
+  }
+
+  interface EmpleadoRepository {
+    + findByIdentificacion(id: String): Optional<Empleado>
+    + findByCodigoEmpleado(codigo: String): Optional<Empleado>
+  }
+
+  interface MenuRepository {
+    + findByPadreIsNull(): List<Menu>
+    + findByPadreId(padreId: Long): List<Menu>
+  }
+}
+
+' ============================================
+' PACKAGE: DTO (Data Transfer Objects)
+' ============================================
+
+package "dto\n(Data Transfer Objects)" as DTO #F3E5F5 {
+
+  class LoginRequest {
+    - username: String
+    - password: String
+    --
+    + getUsername(): String
+    + setUsername(username: String): void
+    + getPassword(): String
+    + setPassword(password: String): void
+  }
+
+  class RegisterRequest {
+    - username: String
+    - email: String
+    - password: String
+    - rol: RolUsuario
+    - clienteId: Long
+    --
+    + getUsername(): String
+    + setUsername(username: String): void
+    + getEmail(): String
+    + setEmail(email: String): void
+    + getPassword(): String
+    + setPassword(password: String): void
+    + getRol(): RolUsuario
+    + setRol(rol: RolUsuario): void
+    + getClienteId(): Long
+    + setClienteId(clienteId: Long): void
+  }
+
+  class AuthResponse {
+    - id: Long
+    - username: String
+    - email: String
+    - rol: RolUsuario
+    - clienteId: Long
+    - mensaje: String
+    --
+    + getId(): Long
+    + setId(id: Long): void
+    + getUsername(): String
+    + setUsername(username: String): void
+    + getEmail(): String
+    + setEmail(email: String): void
+    + getRol(): RolUsuario
+    + setRol(rol: RolUsuario): void
+    + getClienteId(): Long
+    + setClienteId(clienteId: Long): void
+    + getMensaje(): String
+    + setMensaje(mensaje: String): void
+  }
+
+  class ClienteDTO {
+    - id: Long
+    - identificacion: String
+    - nombre: String
+    - telefono: String
+    - correo: String
+    - direccion: String
+    --
+    + getters/setters
+  }
+
+  class VehiculoDTO {
+    - id: Long
+    - placa: String
+    - marca: String
+    - modelo: String
+    - color: String
+    - tipoVehiculo: TipoVehiculo
+    - clienteId: Long
+    --
+    + getters/setters
+  }
+
+  class TicketDTO {
+    - id: Long
+    - codigoTicket: String
+    - horaEntrada: LocalDateTime
+    - horaSalida: LocalDateTime
+    - estado: EstadoTicket
+    - total: Double
+    - vehiculoId: Long
+    - espacioId: Long
+    --
+    + getters/setters
+  }
+
+  class PagoDTO {
+    - id: Long
+    - monto: Double
+    - metodoPago: MetodoPago
+    - estado: EstadoPago
+    - referencia: String
+    - fecha: LocalDateTime
+    - ticketId: Long
+    --
+    + getters/setters
+  }
+
+  class FacturaDTO {
+    - id: Long
+    - numeroFactura: String
+    - subtotal: Double
+    - impuesto: Double
+    - total: Double
+    - pagoId: Long
+    --
+    + getters/setters
+  }
+
+  class ReservaDTO {
+    - id: Long
+    - codigoReserva: String
+    - fechaReserva: LocalDateTime
+    - horaInicio: LocalDateTime
+    - horaFin: LocalDateTime
+    - estado: EstadoReserva
+    - clienteId: Long
+    - vehiculoId: Long
+    - espacioId: Long
+    --
+    + getters/setters
+  }
+
+  class EspacioParqueoDTO {
+    - id: Long
+    - codigo: String
+    - ubicacion: String
+    - estado: EstadoEspacio
+    - tipoVehiculoPermitido: TipoVehiculo
+    - zonaId: Long
+    - zonaNombre: String
+    --
+    + getters/setters
+  }
+
+  class SedeDTO {
+    - id: Long
+    - nombre: String
+    - direccion: String
+    - ciudad: String
+    --
+    + getters/setters
+  }
+
+  class ZonaDTO {
+    - id: Long
+    - nombre: String
+    - descripcion: String
+    - tipoZona: TipoZona
+    - sedeId: Long
+    - sedeNombre: String
+    --
+    + getters/setters
+  }
+
+  class TarifaDTO {
+    - id: Long
+    - tipoVehiculo: TipoVehiculo
+    - valorHora: Double
+    - valorDia: Double
+    - valorFraccion: Double
+    --
+    + getters/setters
+  }
+
+  class EmpleadoDTO {
+    - id: Long
+    - identificacion: String
+    - nombre: String
+    - telefono: String
+    - correo: String
+    - codigoEmpleado: String
+    - cargo: String
+    --
+    + getters/setters
+  }
+
+  class MenuRequest {
+    - nombre: String
+    - ruta: String
+    - activo: Boolean
+    - padreId: Long
+    --
+    + getters/setters
+  }
+
+  class MenuResponse {
+    - id: Long
+    - nombre: String
+    - ruta: String
+    - activo: Boolean
+    - padreId: Long
+    - hijos: List<MenuResponse>
+    --
+    + getters/setters
+  }
+
+  class ClienteDashboardResponse {
+    - clienteId: Long
+    - nombreCliente: String
+    - totalVehiculos: long
+    - totalTickets: long
+    - mensaje: String
+    --
+    + getters/setters
+  }
+}
+
+' ============================================
+' PACKAGE: SERVICE (Interfaces + Impl)
+' ============================================
+
+package "service\n(Interfaces + Implementaciones)" as Service #FFEBEE {
+
+  interface AuthService {
+    + login(request: LoginRequest): AuthResponse
+    + register(request: RegisterRequest): AuthResponse
+    + getAuthenticatedUser(username: String): AuthResponse
+  }
+
+  interface ClienteService {
+    + findAll(): List<ClienteDTO>
+    + findById(id: Long): ClienteDTO
+    + save(dto: ClienteDTO): ClienteDTO
+    + update(id: Long, dto: ClienteDTO): ClienteDTO
+    + delete(id: Long): void
+  }
+
+  interface VehiculoService {
+    + findAll(): List<VehiculoDTO>
+    + findById(id: Long): VehiculoDTO
+    + save(dto: VehiculoDTO): VehiculoDTO
+    + update(id: Long, dto: VehiculoDTO): VehiculoDTO
+    + delete(id: Long): void
+  }
+
+  interface TicketService {
+    + findAll(): List<TicketDTO>
+    + findById(id: Long): TicketDTO
+    + save(dto: TicketDTO): TicketDTO
+    + update(id: Long, dto: TicketDTO): TicketDTO
+    + delete(id: Long): void
+  }
+
+  interface PagoService {
+    + findAll(): List<PagoDTO>
+    + findById(id: Long): PagoDTO
+    + save(dto: PagoDTO): PagoDTO
+    + delete(id: Long): void
+  }
+
+  interface FacturaService {
+    + findAll(): List<FacturaDTO>
+    + findById(id: Long): FacturaDTO
+    + save(dto: FacturaDTO): FacturaDTO
+    + delete(id: Long): void
+  }
+
+  interface ReservaService {
+    + findAll(): List<ReservaDTO>
+    + findById(id: Long): ReservaDTO
+    + save(dto: ReservaDTO): ReservaDTO
+    + update(id: Long, dto: ReservaDTO): ReservaDTO
+    + delete(id: Long): void
+  }
+
+  interface EspacioParqueoService {
+    + findAll(): List<EspacioParqueoDTO>
+    + findById(id: Long): EspacioParqueoDTO
+    + findDisponibles(): List<EspacioParqueoDTO>
+    + save(dto: EspacioParqueoDTO): EspacioParqueoDTO
+    + update(id: Long, dto: EspacioParqueoDTO): EspacioParqueoDTO
+    + delete(id: Long): void
+  }
+
+  interface SedeService {
+    + findAll(): List<SedeDTO>
+    + findById(id: Long): SedeDTO
+    + save(dto: SedeDTO): SedeDTO
+    + update(id: Long, dto: SedeDTO): SedeDTO
+    + delete(id: Long): void
+  }
+
+  interface ZonaService {
+    + findAll(): List<ZonaDTO>
+    + findById(id: Long): ZonaDTO
+    + save(dto: ZonaDTO): ZonaDTO
+    + update(id: Long, dto: ZonaDTO): ZonaDTO
+    + delete(id: Long): void
+  }
+
+  interface TarifaService {
+    + findAll(): List<TarifaDTO>
+    + findById(id: Long): TarifaDTO
+    + save(dto: TarifaDTO): TarifaDTO
+    + update(id: Long, dto: TarifaDTO): TarifaDTO
+    + delete(id: Long): void
+  }
+
+  interface EmpleadoService {
+    + findAll(): List<EmpleadoDTO>
+    + findById(id: Long): EmpleadoDTO
+    + save(dto: EmpleadoDTO): EmpleadoDTO
+    + update(id: Long, dto: EmpleadoDTO): EmpleadoDTO
+    + delete(id: Long): void
+  }
+
+  interface MenuService {
+    + findAll(): List<MenuResponse>
+    + findById(id: Long): MenuResponse
+    + findArbol(): List<MenuResponse>
+    + save(request: MenuRequest): MenuResponse
+    + update(id: Long, request: MenuRequest): MenuResponse
+    + delete(id: Long): void
+  }
+}
+
+' ============================================
+' PACKAGE: CONTROLLER (REST API)
+' ============================================
+
+package "controller\n(REST API - @RestController)" as Controller #E0F2F1 {
+
+  class AuthController {
+    - authService: AuthService
+    --
+    + login(request: LoginRequest): AuthResponse
+    + register(request: RegisterRequest): AuthResponse
+    + me(authentication: Authentication): AuthResponse
+  }
+
+  class ClienteController {
+    - clienteService: ClienteService
+    --
+    + findAll(): List<ClienteDTO>
+    + findById(id: Long): ClienteDTO
+    + create(dto: ClienteDTO): ClienteDTO
+    + update(id: Long, dto: ClienteDTO): ClienteDTO
+    + delete(id: Long): void
+  }
+
+  class VehiculoController {
+    - vehiculoService: VehiculoService
+    --
+    + findAll(): List<VehiculoDTO>
+    + findById(id: Long): VehiculoDTO
+    + create(dto: VehiculoDTO): VehiculoDTO
+    + update(id: Long, dto: VehiculoDTO): VehiculoDTO
+    + delete(id: Long): void
+  }
+
+  class TicketController {
+    - ticketService: TicketService
+    --
+    + findAll(): List<TicketDTO>
+    + findById(id: Long): TicketDTO
+    + create(dto: TicketDTO): TicketDTO
+    + update(id: Long, dto: TicketDTO): TicketDTO
+    + delete(id: Long): void
+  }
+
+  class PagoController {
+    - pagoService: PagoService
+    --
+    + findAll(): List<PagoDTO>
+    + findById(id: Long): PagoDTO
+    + create(dto: PagoDTO): PagoDTO
+    + delete(id: Long): void
+  }
+
+  class FacturaController {
+    - facturaService: FacturaService
+    --
+    + findAll(): List<FacturaDTO>
+    + findById(id: Long): FacturaDTO
+    + create(dto: FacturaDTO): FacturaDTO
+    + delete(id: Long): void
+  }
+
+  class ReservaController {
+    - reservaService: ReservaService
+    --
+    + findAll(): List<ReservaDTO>
+    + findById(id: Long): ReservaDTO
+    + create(dto: ReservaDTO): ReservaDTO
+    + update(id: Long, dto: ReservaDTO): ReservaDTO
+    + delete(id: Long): void
+  }
+
+  class EspacioParqueoController {
+    - espacioParqueoService: EspacioParqueoService
+    --
+    + findAll(): List<EspacioParqueoDTO>
+    + findById(id: Long): EspacioParqueoDTO
+    + findDisponibles(): List<EspacioParqueoDTO>
+    + create(dto: EspacioParqueoDTO): EspacioParqueoDTO
+    + update(id: Long, dto: EspacioParqueoDTO): EspacioParqueoDTO
+    + delete(id: Long): void
+  }
+
+  class SedeController {
+    - sedeService: SedeService
+    --
+    + findAll(): List<SedeDTO>
+    + findById(id: Long): SedeDTO
+    + create(dto: SedeDTO): SedeDTO
+    + update(id: Long, dto: SedeDTO): SedeDTO
+    + delete(id: Long): void
+  }
+
+  class ZonaController {
+    - zonaService: ZonaService
+    --
+    + findAll(): List<ZonaDTO>
+    + findById(id: Long): ZonaDTO
+    + create(dto: ZonaDTO): ZonaDTO
+    + update(id: Long, dto: ZonaDTO): ZonaDTO
+    + delete(id: Long): void
+  }
+
+  class TarifaController {
+    - tarifaService: TarifaService
+    --
+    + findAll(): List<TarifaDTO>
+    + findById(id: Long): TarifaDTO
+    + create(dto: TarifaDTO): TarifaDTO
+    + update(id: Long, dto: TarifaDTO): TarifaDTO
+    + delete(id: Long): void
+  }
+
+  class EmpleadoController {
+    - empleadoService: EmpleadoService
+    --
+    + findAll(): List<EmpleadoDTO>
+    + findById(id: Long): EmpleadoDTO
+    + create(dto: EmpleadoDTO): EmpleadoDTO
+    + update(id: Long, dto: EmpleadoDTO): EmpleadoDTO
+    + delete(id: Long): void
+  }
+
+  class MenuController {
+    - menuService: MenuService
+    --
+    + findAll(): List<MenuResponse>
+    + findById(id: Long): MenuResponse
+    + findArbol(): List<MenuResponse>
+    + create(request: MenuRequest): MenuResponse
+    + update(id: Long, request: MenuRequest): MenuResponse
+    + delete(id: Long): void
+  }
+
+  class ClienteZonaController {
+    - vehiculoRepository: VehiculoRepository
+    - ticketRepository: TicketRepository
+    - clienteRepository: ClienteRepository
+    --
+    + getDashboard(authentication: Authentication): ClienteDashboardResponse
+    + getMisVehiculos(authentication: Authentication): List<VehiculoDTO>
+    + getMisTickets(authentication: Authentication): List<TicketDTO>
+  }
+
+  class DebugController {
+    + test(): String
+  }
+}
+
+' ============================================
+' PACKAGE: SECURITY
+' ============================================
+
+package "security\n(Configuración Spring Security)" as Security #FCE4EC {
+
+  class SecurityConfig {
+    - usuarioRepository: UsuarioRepository
+    --
+    + userDetailsService(): UserDetailsService
+    + passwordEncoder(): PasswordEncoder
+    + corsConfigurationSource(): CorsConfigurationSource
+    + securityFilterChain(http: HttpSecurity): SecurityFilterChain
+  }
+}
+
+' ============================================
+' PACKAGE: EXCEPTION
+' ============================================
+
+package "exception\n(Manejo de Excepciones)" as Exception #FFCDD2 {
+
+  class ResourceNotFoundException {
+    - resourceName: String
+    - fieldName: String
+    - fieldValue: Object
+    --
+    + getResourceName(): String
+    + getFieldName(): String
+    + getFieldValue(): Object
+  }
+
+  class BusinessException {
+    - mensaje: String
+    --
+    + getMensaje(): String
+  }
+
+  class GlobalExceptionHandler {
+    + handleResourceNotFoundException(ex: ResourceNotFoundException): ResponseEntity
+    + handleBusinessException(ex: BusinessException): ResponseEntity
+    + handleValidationExceptions(ex: MethodArgumentNotValidException): ResponseEntity
+    + handleGenericException(ex: Exception): ResponseEntity
+  }
+}
+
+' ============================================
+' RELACIONES ENTRE PACKAGES
+' ============================================
+
+' Model usa Enums
+Model ..> Enums : usa
+
+' Repository usa Model
+Repository ..> Model : mapea
+
+' Service usa Repository y DTO
+Service ..> Repository : usa
+Service ..> DTO : convierte
+
+' Controller usa Service y DTO
+Controller ..> Service : invoca
+Controller ..> DTO : recibe/retorna
+
+' Security usa Repository
+Security ..> Repository : usa
+
+' Controller usa Security
+Controller ..> Security : autenticado_por
+
+' Service usa Exception
+Service ..> Exception : lanza
+
+' ============================================
+' NOTAS EXPLICATIVAS
+' ============================================
+
+note right of Model
+  **Entidades JPA**
+  - @Entity + @Table
+  - Herencia JOINED para Vehiculo
+  - Menu NO extiende BaseEntity
+  - Relaciones FK con @ManyToOne, @OneToOne
+  - Auditoría automática con @PrePersist/@PreUpdate
+end note
+
+note right of Enums
+  **Enumeraciones**
+  - @Enumerated(EnumType.STRING)
+  - Almacenadas como texto en BD
+  - Validación de valores permitidos
+end note
+
+note right of Repository
+  **Interfaces JPA**
+  - Extienden JpaRepository<Entity, Long>
+  - Métodos derivados por nombre
+  - Consultas automáticas sin SQL
+end note
+
+note right of DTO
+  **Data Transfer Objects**
+  - Separan API de entidades
+  - *Request: datos de entrada
+  - *Response: datos de salida
+  - *DTO: CRUD estándar
+end note
+
+note right of Service
+  **Capa de Negocio**
+  - Interfaces + *ServiceImpl
+  - Lógica de negocio
+  - Conversión Entity ↔ DTO
+  - Validaciones
+end note
+
+note right of Controller
+  **REST API**
+  - @RestController + @RequestMapping
+  - Endpoints /api/{recurso}
+  - Inyección de servicios
+  - Respuestas HTTP estándar
+end note
+
+note right of Security
+  **Spring Security**
+  - HTTP Basic Auth
+  - BCrypt para passwords
+  - CORS configurado
+  - Protección por roles
+end note
+
+note right of Exception
+  **Manejo de Errores**
+  - @ControllerAdvice
+  - Respuestas estructuradas
+  - Códigos HTTP apropiados
+end note
+
+@enduml
+ 
